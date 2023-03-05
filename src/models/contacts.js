@@ -1,40 +1,49 @@
-const { ContactModel  } = require("../db/schema");
+const { ContactModel } = require('../db/contactSchema');
 
-const listContacts = async () => {
-	const getAllContacts = await ContactModel.find({});
-	return getAllContacts;
+const listContacts = async owner => {
+    const getAllContacts = await ContactModel.find({ owner }).populate({
+        path: 'owner',
+        match: { id: { $ne: null } },
+    });
+    return getAllContacts;
 };
 
 const getContactById = async contactId => {
-	const getOneContactById = await ContactModel.findById(contactId);
-	return getOneContactById;
+    const getOneContactById = await ContactModel.findById(contactId);
+    return getOneContactById;
 };
 
 const removeContact = async contactId => {
-	const removeContactById = await ContactModel.findByIdAndRemove(contactId);
-	return removeContactById;
+    const removeContactById = await ContactModel.findByIdAndRemove(contactId);
+    return removeContactById;
 };
 
-const addContact = async (body) => {
-	const newContact = new ContactModel(body);
-	await newContact.save();
+const addContact = async body => {
+    const newContact = new ContactModel(body);
+    await newContact.save();
 };
 
 const updateContact = async (contactId, body) => {
-	const updateContactById = await ContactModel.findByIdAndUpdate(contactId, body);
-	return updateContactById;
+    const updateContactById = await ContactModel.findByIdAndUpdate(
+        contactId,
+        body
+    );
+    return updateContactById;
 };
 
 const updateStatusContact = async (contactId, favorite) => {
-	const updateFavoriteField = await ContactModel.findByIdAndUpdate(contactId, favorite)
-	return updateFavoriteField
+    const updateFavoriteField = await ContactModel.findByIdAndUpdate(
+        contactId,
+        favorite
+    );
+    return updateFavoriteField;
 };
 
 module.exports = {
-	listContacts,
-	getContactById,
-	removeContact,
-	addContact,
-	updateContact,
-	updateStatusContact,
+    listContacts,
+    getContactById,
+    removeContact,
+    addContact,
+    updateContact,
+    updateStatusContact,
 };

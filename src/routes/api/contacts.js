@@ -10,6 +10,10 @@ const {
 	removeContactById,
 } = require("../../controllers/index");
 
+const {authMiddleware} = require('../../middlewares/authMiddleware')
+
+contactsRouter.use(authMiddleware)
+
 contactsRouter.get("/", getAllContacts);
 
 contactsRouter.get("/:contactId", getOneContactById);

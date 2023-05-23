@@ -7,7 +7,7 @@ const {
 	removeContactById,
 } = require("./contacts/index");
 
-const { loginController, registrationController } = require("./auth/index");
+const { loginController, registrationController, currentUserController, logoutController } = require("./auth/index");
 
 module.exports = {
 	addNewContact,
@@ -18,4 +18,6 @@ module.exports = {
 	removeContactById,
 	loginController,
 	registrationController,
+	currentUserController,
+	logoutController
 };

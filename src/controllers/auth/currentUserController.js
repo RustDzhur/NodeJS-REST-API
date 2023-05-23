@@ -1,20 +1,10 @@
-const { User } = require('../../db/authSchema');
+const { ctrlWrapper } = require('../../decorators/ctrlWrapper');
 
 const currentUserController = async (req, res) => {
-	try {
-	  const user = await User.findById(req.user.id);
-	  if (!user) {
-		return res.status(401).json({ message: 'Not authorized' });
-	  }
-	  res.json({
-		email: user.email,
-		subscription: user.subscription,
-	  });
-	} catch (error) {
-	  res.status(500).json({ message: error.message });
-	}
-  }
+	const { email, name } = req.user;
+	res.json({ name, email });
+};
 
-  module.exports = {
-    currentUserController
-  }
+module.exports = {
+    currentUserController: ctrlWrapper(currentUserController),
+};

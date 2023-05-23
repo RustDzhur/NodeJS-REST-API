@@ -1,33 +1,21 @@
-const jsonwebtoken = require('jsonwebtoken');
+const { User } = require("../models/authSchema");
+const { HttpError } = require("../helpers");
+const jwt = require("jsonwebtoken");
 
-const authMiddleware = (req, res, next) => {
-    const authHeader = req.headers.authorization;
+const authenticate = async (req, res, next) => {
+	const { authorization = "" } = req.headers;
+	const [bearer, token] = authorization.split(" ");
 
-    if (!authHeader) {
-        res.status(498).json({
-            message: 'Not authorized',
-        });
-        return;
-    }
-
-    const [, token] = authHeader.split(' ');
-
-    if (!token) {
-        res.status(498).json({
-            message: 'Not authorized',
-        });
-        return;
-    }
-
-    try {
-        const user = jsonwebtoken.decode(token, process.env.JWTSecret);
-        req.user = user;
-        req.token = token;
-        next();
-    } catch (error) {
-        res.status(498).json({ message: 'Invalid token' });
-    }
+	if (bearer !== "Bearer") next(HttpError(401));
+	try {
+		const { id } = jwt.verify(token, process.env.SECRET);
+		const user = await User.findById(id);
+		if (!user || !user.token) next(HttpError(401));
+        req.user = user
+		next();
+	} catch {
+		next(HttpError(401));
+	}
 };
-module.exports = {
-    authMiddleware,
-};
+
+module.exports = authenticate;

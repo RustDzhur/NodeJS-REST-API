@@ -6,7 +6,9 @@ const userCtrl = require('../../controllers');
 
 const { authenticate, upload } = require('../../middlewares');
 
-router.post('/signup', userCtrl.registrationController);
+const sendEmail = require('../../helpers/sendEmail');
+
+router.post('/signup', userCtrl.registrationController, sendEmail);
 router.post('/signin', userCtrl.loginController);
 router.post('/logout', authenticate, userCtrl.logoutController);
 router.get('/current', authenticate, userCtrl.currentUserController);
@@ -16,5 +18,7 @@ router.patch(
     upload.single('avatar'),
     userCtrl.updateAvatar
 );
+router.get('/verify/:verificationToken', userCtrl.emailVerify);
+router.post('/verify', userCtrl.verify)
 
 module.exports = router;

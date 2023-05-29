@@ -1,9 +1,10 @@
 const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
 const gravatar = require('gravatar');
-// const { v4: uuidv4 } = require("uuid");
+const { v4: uuidv4 } = require("uuid");
 const { User } = require('./authSchema');
-const { HttpError } = require('../helpers');
+const { HttpError, sendEmail } = require('../helpers');
+const BASE_URL = process.env.BASE_URL;
 
 const signup = async body => {
     const { email, password } = body;
@@ -11,12 +12,19 @@ const signup = async body => {
     if (user) throw HttpError(409, 'Email already in use');
     const avatarUrl = gravatar.url(email);
     const hashPassword = await bcrypt.hash(password, 10);
-    const result = await User.create({
+    const verificationToken = uuidv4();
+    await User.create({
         ...body,
         avatarUrl,
         password: hashPassword,
+        verificationToken,
     });
-    return result;
+    const verifyEmail = {
+        to: email,
+        subject: "Verify email",
+        html: `<a target="_blanc" href= "${BASE_URL}/api/users/verify/${verificationToken}">Click for verifying your email</a>`,
+    };
+    await sendEmail(verifyEmail);
 };
 
 const signin = async body => {
